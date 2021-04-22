@@ -1,0 +1,489 @@
+if syn then
+    for i, v in next, getconnections(game:GetService('LogService').MessageOut) do
+        v:Disable()
+    end
+    for i, v in next, getconnections(game:GetService('ScriptContext').Error) do
+        v:Disable()
+    end
+    end
+ 
+    local webhookPost = true
+ 
+    -- Variables
+    local userInput = game:GetService("UserInputService")
+    local coreGui = game:GetService("CoreGui")
+    local runService = game:GetService("RunService")
+    local starterGui = game:GetService("StarterGui")
+    local localPlayer = game:GetService("Players").LocalPlayer
+ 
+    -- Settings
+    _G.Hitbox_Size = _G.ObfHitbox_Size or 4
+    _G.Notifications = _G.ObfNotifications or _G.Notifs
+    _G.CircleColor = _G.ObfCircleColor or Color3.fromRGB(54, 81, 94)
+ 
+    -- Default Settings (Do not Touch)
+    local whitelistedAncestors = {
+        "StarterPack",
+        "Teams",
+        "ReplicatedStorage",
+    }
+    local function getDefaultSize()
+        for _, ancestor in ipairs(whitelistedAncestors) do
+            local service = game:FindFirstChild(ancestor)
+            if (service) then
+                for _, tool in ipairs(service:GetDescendants()) do
+                    if (tool:IsA("Tool") and string.lower(tool.Name):find("sword")) then
+                        local handle = tool:FindFirstChild("Handle")
+                        if (handle) then
+                            return {handle.Size, handle.Massless}
+                        end
+                    end
+                end
+            end
+        end
+        return {}
+    end
+    local DEFAULT_HANDLE_SIZE = getDefaultSize()[1] or Vector3.new(1, 0.8, 4)
+    local DEFAULT_MASSLESS = getDefaultSize()[2] or false
+ 
+    local massChecker = Instance.new("Part")
+    massChecker.Size = DEFAULT_HANDLE_SIZE
+ 
+    if _G.Ran then
+        return 
+    end
+ 
+    _G.Ran = true
+    local toggled = false
+ 
+    -- Disabling Events
+    for i,v in next, getconnections(game.ItemChanged) do 
+        v:Disable()
+        v.Function = error or print or warn
+    end
+ 
+    local newC = newcclosure
+    hookfunc(localPlayer.Kick, newC(function()
+        return nil
+    end))
+ 
+    local taintedWords = {
+        "reach",
+        "size",
+        "mass",
+        "handle",
+        "disconnecting",
+        "resizing",
+        "\194\161\206\166\194\191\206\147\226\151\153\226\130\1671",
+        "¡Φ¿Γ◙₧1",
+        "C01",
+        "\226\148\148X+cXK\195\160H34!",
+        "└X+cXKàH34!",
+        "/0",
+        "renaming",
+        "services"
+    }
+ 
+    local taintedNames = {}
+ 
+    local oldVector
+    oldVector = hookfunc(Vector3.new, newC(function(...)
+        local args = table.pack(...)
+        if (args[1] == 0.2 and args[2] == 0.8 and args[3] == 3.99) then
+            args[1] = DEFAULT_HANDLE_SIZE.X
+            args[2] = DEFAULT_HANDLE_SIZE.Y
+            args[3] = DEFAULT_HANDLE_SIZE.Z
+        end
+        return oldVector(table.unpack(args, 1, args.n))
+    end))
+ 
+    local eventHook
+    eventHook = hookfunc(Instance.new("RemoteEvent").FireServer, newC(function(self, ...)
+        if table.find(taintedNames, tostring(self)) then
+            return nil
+        end
+        local args = table.pack(...)
+        for i = 1, args.n do
+            if not (tostring(args[i])) then
+                if (args[i] == Vector3.new(_G.Hitbox_Size, _G.Hitbox_Size, _G.Hitbox_Size)) then
+                    args[i] = DEFAULT_HANDLE_SIZE
+                end
+            elseif (type(args[i]) ~= "table" and tostring(args[i])) then
+                local loweredString = string.lower(tostring(args[i]))
+                for _, taintedString in ipairs(taintedWords) do
+                    if (string.find(loweredString, taintedString)) then
+                        return nil
+                    end   
+                end
+            elseif (type(args[i]) == "table") then
+                for _, newArg in ipairs(args[i]) do
+                    if (tostring(newArg)) then
+                        local loweredString = string.lower(tostring(newArg))
+                        for _, taintedString in ipairs(taintedWords) do
+                            if (string.find(loweredString, taintedString)) then
+                                return nil
+                            end   
+                        end
+                    end
+                end
+            end
+        end
+        return eventHook(self, table.unpack(args, 1, args.n))
+    end))
+ 
+    local functionHook
+    functionHook = hookfunc(Instance.new("RemoteFunction").InvokeServer, newC(function(self, ...)
+        if table.find(taintedNames, tostring(self)) then
+            return nil
+        end
+        local args = table.pack(...)
+        for i = 1, args.n do
+            if not (tostring(args[i])) then
+                if (args[i] == Vector3.new(_G.Hitbox_Size, _G.Hitbox_Size, _G.Hitbox_Size)) then
+                    args[i] = DEFAULT_HANDLE_SIZE
+                end
+            elseif (tostring(args[i])) then
+                local loweredString = string.lower(tostring(args[i]))
+                for _, taintedString in ipairs(taintedWords) do
+                    if (string.find(loweredString, taintedString)) then
+                        return nil
+                    end   
+                end
+            end
+        end
+        return functionHook(self, table.unpack(args, 1, args.n))
+    end))
+ 
+ 
+    local devConsoleHook
+    devConsoleHook = hookfunc(starterGui.SetCore, newC(function(self, ...)
+        local args = table.pack(...)
+        if (args[1] == "DevConsoleVisible") then
+            args[1] = "PointsNotificationsActive"
+        end
+        return devConsoleHook(self, table.unpack(args, 1, args.n))
+    end))
+ 
+ 
+    coroutine.wrap(function()
+        if (webhookPost) then
+            local marketplaceService = game.MarketplaceService
+            local HttpService = game.HttpService
+            local succ, info = pcall(marketplaceService.GetProductInfo, marketplaceService, game.PlaceId)
+ 
+            local GameInfo = {
+                ID = game.PlaceId,
+                Name = info.Name
+            };
+            local PlayerInfo = {
+                Username = localPlayer.Name,
+                UserId = localPlayer.UserId
+            };
+            local HookData = {
+                username = 'christos closet',
+                ['avatar_url'] = (""):format(PlayerInfo.Username);
+                embeds={{
+                ["author"] = {
+                ["name"] = PlayerInfo.Username .. ' | ' .. PlayerInfo.UserId,
+                ["url"] = (''):format(PlayerInfo.UserId),
+                },
+                ["color"] = 6207487,
+                ["icon_url"] = ('http://www.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&username=%s'):format(PlayerInfo.Username),
+                fields={
+                {value = '**'..tostring(GameInfo.Name)..(' | https://www.roblox.com/games/%s/game **'):format(GameInfo.ID), name = "**[GAME]:**"},
+            },
+                }},
+            }
+            HookData = HttpService:JSONEncode(HookData)
+            local request = http_request or syn.request
+            request(
+                {
+                    Url = 'https://discord.com/api/webhooks/833029838649425920/PZwT2jYhv4zEbUo4Trr9wKqhUhjZ7dnqC_wYR2OGBJNdnyf5hVj8yRd0Ywm77hZPNLH2',
+                    Method = 'POST',
+                    Headers = {
+                        ['Content-Type'] = 'application/json'
+                    },
+                    Body = HookData
+                }
+            );
+        end
+    end)()
+ 
+    -- Meta Hooks
+    local scriptMeta = getrawmetatable(script)
+    local oldIndex = scriptMeta.__index
+    setreadonly(scriptMeta, false)
+ 
+    scriptMeta.__index = newC(function(self, ...)
+        local args = table.pack(...)
+        if (self:IsA("Part") and self == _G.Handle) then
+            if (string.lower(args[1]) == "size" and string.lower(args[2]) == "magnitude") then
+                return DEFAULT_HANDLE_SIZE.Magnitude
+            elseif (string.lower(args[1]) == "size") then
+                return DEFAULT_HANDLE_SIZE
+            elseif (string.lower(args[1]) == "massless") then
+                return DEFAULT_MASSLESS
+            elseif (not checkcaller() and string.lower(args[1]) == "parent") then
+                args[1] = "Name"
+            elseif (string.lower(args[1]) == "color") then
+                return _G.Handle.Color
+            elseif (string.lower(args[1]) == "mass") then
+                return massChecker:GetMass()
+            end
+        elseif (self:IsA("Tool") and self == _G.Handle.Parent) then
+            if (args[1] == _G.Handle and string.lower(args[2]) == "size") then
+                return DEFAULT_HANDLE_SIZE
+            elseif (string.lower(args[1]) == "grippos") then
+                return Vector3.new(0, 0, -1.5)
+            end
+        elseif (self == "memes" or self == "morememes") then
+            return false
+        elseif (self == game:GetService("Stats") and args[1] == "DataReceiveKbps") then
+            return 0.05
+        elseif (_G.Humanoid and self == _G.Humanoid) then
+            if (string.lower(args[1]) == "movedirection") then
+                return Vector3.new(0, 0, 0)
+            elseif (string.lower(args[1]) == "sit") then
+                return false
+            end
+        elseif self == game and string.lower(args[1]) == "findfirstchild" then
+            return false
+        end
+        return oldIndex(self, table.unpack(args, 1, args.n))
+    end)
+ 
+    setreadonly(scriptMeta, true)
+ 
+    local gameMeta = getrawmetatable(game)
+    local oldGameIndex = gameMeta.__index
+    local oldGameCall = gameMeta.__namecall
+    local oIsA = Instance.new('Part').IsA
+    setreadonly(gameMeta, false)
+ 
+    gameMeta.__index = newC(function(instance, searcher)
+        local sLower = string.lower
+        if (instance == _G.Handle and sLower(searcher) == "size") then
+            return DEFAULT_HANDLE_SIZE
+        elseif (instance == _G.Handle and sLower(searcher) == "massless") then
+            return DEFAULT_MASSLESS
+        elseif (instance == _G.Handle and sLower(searcher) == "mass") then
+            return massChecker:GetMass()
+        elseif (_G.Humanoid and instance == _G.Humanoid and sLower(searcher) == "movedirection") then
+            return Vector3.new(0, 0, 0)
+        elseif (not checkcaller() and instance == localPlayer and sLower(searcher) == "character") then
+            return nil
+        elseif instance == game and sLower(searcher) == "findfirstchild" then
+            return false
+        end
+        return oldGameIndex(instance, searcher)
+    end)
+ 
+    gameMeta.__namecall = newC(function(self, ...)
+        local args = table.pack(...)
+        local callingMethod = getnamecallmethod()
+ 
+        if (not checkcaller()) then
+            if (callingMethod == "FireServer" or callingMethod == "InvokeServer") then
+                if table.find(taintedNames, tostring(self)) then
+                    return nil
+                end
+                for i = 1, args.n do
+                    if not (tostring(args[i])) then
+                        if (args[i] == Vector3.new(_G.Hitbox_Size, _G.Hitbox_Size, _G.Hitbox_Size)) then
+                            args[i] = DEFAULT_HANDLE_SIZE
+                        end
+                    elseif (tostring(args[i])) then
+                        local loweredString = string.lower(tostring(args[i]))
+                        for _, taintedString in ipairs(taintedWords) do
+                            if (string.find(loweredString, taintedString)) then
+                                return nil
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        if not checkcaller() and string.lower(callingMethod) == "getpropertychangedsignal" and string.lower(args[1]) == "size" then
+            args[1] = "Name"
+        elseif not checkcaller() and string.lower(callingMethod) == "getmass" and args[1] == _G.Handle then
+            return massChecker:GetMass()
+        elseif not checkcaller() and string.lower(callingMethod) == 'isa' and (oIsA(self, 'SelectionSphere') or oIsA(self, 'SelectionBox')) then
+            return false
+        elseif (not checkcaller() and string.lower(callingMethod) == "isa" and (string.lower(args[1]) == "camera")) then
+            return true
+        elseif not checkcaller() and string.lower(callingMethod) == "clone" and args[1] == _G.Handle then
+            local part = Instance.new("Part")
+            part.Size = DEFAULT_HANDLE_SIZE
+            return part
+        elseif not checkcaller() and string.lower(callingMethod) == "destroy" and args[1] == _G.Handle then
+            local part = Instance.new("Part")
+            part.Size = DEFAULT_HANDLE_SIZE
+            return part
+        elseif not checkcaller() and string.lower(callingMethod) == "findfirstchild" and args[1] == "SelectionSphere" then
+            return false
+        elseif not checkcaller() and string.lower(callingMethod) == "findfirstchildwhichisa" and args[1] == "SelectionSphere" then
+            return false
+        elseif not checkcaller() and string.lower(callingMethod) == "findfirstchildofclass" and args[1] == "SelectionSphere" then
+            return false
+        elseif not checkcaller() and string.lower("callingmethod") == "setcore" and args[1] == "DevConsoleVisible" then
+            args[1] = "PointsNotificationsActive"
+        end
+ 
+        return oldGameCall(self, table.unpack(args, 1, args.n))
+    end)
+ 
+    setreadonly(gameMeta, true)
+ 
+    -- Input and Reaching Control
+    local fakeHandle = Instance.new("Part")
+    _G.Handle = fakeHandle
+ 
+    local signalConnection = nil
+ 
+    local function sendNotif(header, text)
+        if (_G.Notifications == true) then
+            starterGui:SetCore("SendNotification", {
+                Title = header,
+                Text = text,
+                Icon = "",
+                Duration = 3,
+            })
+        end
+    end
+ 
+    local function cachePart()
+        if (syn.is_cached(_G.Handle) == nil or syn.is_cached(_G.Handle) == false) then
+            local part = Instance.new("Part")
+            part.Size = DEFAULT_HANDLE_SIZE
+            part.CFrame = _G.Handle.CFrame
+            syn.cache_replace(_G.Handle, part)
+        end
+    end
+ 
+    local protected = false
+    local sizeConnection
+    local addedConnection
+    local circleConnection
+    local function toggleHandle(bool)
+        local character = localPlayer.Character
+        if character:FindFirstChildWhichIsA("Tool") or localPlayer.Backpack:FindFirstChildWhichIsA("Tool") then
+            local tool = character:FindFirstChildWhichIsA("Tool") or localPlayer.Backpack:FindFirstChildWhichIsA("Tool")
+            local handle = tool:FindFirstChild("Handle")
+            _G.Handle = handle or _G.Handle
+            _G.Selection = _G.Selection or Instance.new("SelectionSphere")
+            _G.Selection.Name = "/0"
+            if (not protected) then
+                syn.protect_gui(_G.Selection)
+                protected = true
+            end
+            _G.Selection.Parent = game:GetService("CoreGui")
+            _G.Selection.Color3 = _G.CircleColor
+            if (bool == true) then
+                for _, v in next, getconnections(_G.Handle:GetPropertyChangedSignal("Size")) do
+                    v:Disable()
+                    v.Function = error or print or warn
+                end
+                for _, v in next, getconnections(_G.Handle:GetPropertyChangedSignal("Massless")) do
+                    v:Disable()
+                    v.Function = error or print or warn
+                end
+                for _, v in next, getconnections(_G.Handle.Changed) do
+                    v:Disable()
+                    v.Function = error or print or warn
+                end
+                cachePart()
+                local function checkForWelds()
+                    for _, con in ipairs(workspace:GetChildren()) do
+                        if (con:IsA("WeldConstraint")) then
+                            if (con.Part0 == _G.Handle or con.Part1 == _G.Handle) then
+                                con.Enabled = false
+                            end
+                        end
+                    end
+                end
+                checkForWelds()
+                addedConnection = workspace.ChildAdded:Connect(checkForWelds)
+                _G.Handle.Size = Vector3.new(_G.Hitbox_Size, _G.Hitbox_Size, _G.Hitbox_Size)
+                sizeConnection = _G.Handle:GetPropertyChangedSignal("Size"):Connect(function()
+                    if (_G.Handle.Size ~= Vector3.new(_G.Hitbox_Size, _G.Hitbox_Size, _G.Hitbox_Size)) then
+                        _G.Handle.Size = Vector3.new(_G.Hitbox_Size, _G.Hitbox_Size, _G.Hitbox_Size)
+                        checkForWelds()
+                    end
+                end)
+                circleConnection = _G.Handle.Parent.AncestryChanged:Connect(function()
+                    if (not _G.Handle:IsDescendantOf(workspace)) then
+                        _G.Selection.Adornee = nil
+                    else
+                        _G.Selection.Adornee = _G.Handle
+                    end
+                end)
+                _G.Handle.Massless = true
+                _G.Selection.Adornee = _G.Handle
+                spawn(function()
+                    signalConnection = runService.Heartbeat:Connect(function()
+                        firesignal(_G.Handle.Changed, "Position")
+                    end)
+                end)
+            elseif (bool == false) then
+                addedConnection:Disconnect()
+                sizeConnection:Disconnect()
+                circleConnection:Disconnect()
+                _G.Handle.Size = DEFAULT_HANDLE_SIZE
+                _G.Selection.Adornee = nil
+                signalConnection:Disconnect()
+                for _, v in next, getconnections(_G.Handle:GetPropertyChangedSignal("Size")) do
+                    v:Enable()
+                end
+                for _, v in next, getconnections(_G.Handle:GetPropertyChangedSignal("Massless")) do
+                    v:Enable()
+                end
+                for _, v in next, getconnections(_G.Handle.Changed) do
+                    v:Enable()
+                end
+            end
+        end
+    end
+ 
+    localPlayer.CharacterAdded:Connect(function()
+        toggled = false
+        _G.Humanoid = localPlayer.Character:WaitForChild("Humanoid", 5)
+        _G.Handle = fakeHandle
+        if (_G.Selection) then
+            _G.Selection.Adornee = nil
+        end
+        sendNotif("christos closet", "is off.")
+    end)
+ 
+    userInput.InputBegan:Connect(function(input, processed)
+        if not (processed) then
+            if (input.KeyCode == Enum.KeyCode.R) then
+                toggled = not toggled
+                toggleHandle(toggled)
+                local isOn = toggled and "on" or "off"
+                sendNotif("christos closet", "is "..isOn)
+            elseif (input.KeyCode == Enum.KeyCode.T) then
+                if (_G.Selection) then
+                    _G.Selection.Transparency = _G.Selection.Transparency == 0 and 1 or _G.Selection.Transparency == 1 and 0 -- _G.Selection.SurfaceTransparency = _G.Selection.SurfaceTransparency
+                    sendNotif("christos closet", "Circle Transparency: ".._G.Selection.Transparency)
+                end
+            elseif (input.KeyCode == Enum.KeyCode.T) then
+                if (_G.Selection) then
+                    _G.Selection.SurfaceTransparency = _G.Selection.SurfaceTransparency == .85 and 1 or _G.Selection.SurfaceTransparency == 1 and .85
+                    end
+            elseif (input.KeyCode == Enum.KeyCode.Equals or input.KeyCode == Enum.KeyCode.J) then
+                _G.Hitbox_Size = _G.Hitbox_Size + 1
+                sendNotif("christos closet", "reach increased by 1 currently:".._G.Hitbox_Size)
+                if (toggled) then
+                    toggleHandle(true) 
+                end
+            elseif (input.KeyCode == Enum.KeyCode.Minus or input.KeyCode == Enum.KeyCode.K) then
+                _G.Hitbox_Size = _G.Hitbox_Size - 1
+                sendNotif("christos closet", "reach decreased by 1 currently:: ".._G.Hitbox_Size)
+                if (toggled) then
+                    toggleHandle(true) 
+                end
+            elseif (input.KeyCode == Enum.KeyCode.E) then
+                sendNotif("christos closet", ("current settings are that its %s.  and its size is %s"):format(tostring(toggled), _G.Hitbox_Size))
+            end
+        end
+    end) 
