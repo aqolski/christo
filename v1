@@ -472,19 +472,19 @@ if syn then
                 local isOn = toggled and "on" or "off"
                 sendNotif("christos closet", "is "..isOn)
             elseif (input.KeyCode == Enum.KeyCode.T) then
-                if (_G.Selection) then
-                    _G.Selection.Transparency = _G.Selection.Transparency == 0 and 1 or _G.Selection.Transparency == 1 and 0
-                    sendNotif("christos closet", "Circle Transparency: ".._G.Selection.Transparency)
+             if (_G.Selection) then
+           _G.Selection.Transparency = _G.Selection.Transparency == 0 and 1 or Selection.Transparency == 1 and 0
+                    sendNotif("christos closet", "circle transparency is ".._G.Selection.Transparency)
                 end
             elseif (input.KeyCode == Enum.KeyCode.Equals or input.KeyCode == Enum.KeyCode.J) then
                 _G.Hitbox_Size = _G.Hitbox_Size + 1
-                sendNotif("christos closet", "reach increased by 1 currently:".._G.Hitbox_Size)
+                sendNotif("christos closet", "reach increased by 1 so its size is currently ".._G.Hitbox_Size)
                 if (toggled) then
                     toggleHandle(true) 
                 end
             elseif (input.KeyCode == Enum.KeyCode.Minus or input.KeyCode == Enum.KeyCode.K) then
                 _G.Hitbox_Size = _G.Hitbox_Size - 1
-                sendNotif("christos closet", "reach decreased by 1 currently:: ".._G.Hitbox_Size)
+                sendNotif("christos closet", "reach decreased by 1 so its size is currently ".._G.Hitbox_Size)
                 if (toggled) then
                     toggleHandle(true) 
                 end
@@ -492,7 +492,7 @@ if syn then
                 sendNotif("christos closet", ("current settings are that its %s.  and its size is %s"):format(tostring(toggled), _G.Hitbox_Size))
             end
         end
-    end) 
+    end)
 
 else game:service('Players').LocalPlayer:Kick('christo#0001 to whitelist D:')
 end
