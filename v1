@@ -19,7 +19,7 @@ if syn then
     -- Settings
     _G.Hitbox_Size = _G.ObfHitbox_Size or 4
     _G.Notifications = _G.ObfNotifications or _G.Notifs
-    _G.CircleColor = _G.ObfCircleColor or Color3.fromRGB(54, 81, 94)
+    _G.CircleColor = _G.ObfCircleColor or Color3.fromRGB(248,226,95)
  
     -- Default Settings (Do not Touch)
     local whitelistedAncestors = {
