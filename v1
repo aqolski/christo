@@ -345,7 +345,7 @@ if syn then
             starterGui:SetCore("SendNotification", {
                 Title = header,
                 Text = text,
-                Icon = "",
+                Icon = "rbxassetid://6715653895",
                 Duration = 3,
             })
         end
