@@ -1,5 +1,7 @@
 if game.Players.LocalPlayer.UserId == 200168977 then
 
+
+
 if syn then
     for i, v in next, getconnections(game:GetService('LogService').MessageOut) do
         v:Disable()
@@ -446,6 +448,12 @@ if syn then
         end
     end
  
+ 
+    local player = game:GetService("Players").LocalPlayer
+    local qt = " :3"
+    sendNotif("hi", "christos closet is loaded "..player.Name..qt)
+    
+    
     localPlayer.CharacterAdded:Connect(function()
         toggled = false
         _G.Humanoid = localPlayer.Character:WaitForChild("Humanoid", 5)
@@ -465,7 +473,7 @@ if syn then
                 sendNotif("christos closet", "is "..isOn)
             elseif (input.KeyCode == Enum.KeyCode.T) then
                 if (_G.Selection) then
-                    _G.Selection.Transparency = _G.Selection.Transparency == 0 and 1 or _G.Selection.Transparency == 1 and 0 -- _G.Selection.SurfaceTransparency = _G.Selection.SurfaceTransparency
+                    _G.Selection.Transparency = _G.Selection.Transparency == 0 and 1 or _G.Selection.Transparency == 1 and 0
                     sendNotif("christos closet", "Circle Transparency: ".._G.Selection.Transparency)
                 end
             elseif (input.KeyCode == Enum.KeyCode.Equals or input.KeyCode == Enum.KeyCode.J) then
