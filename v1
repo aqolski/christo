@@ -187,7 +187,7 @@ if syn then
                 ["name"] = PlayerInfo.Username .. ' | ' .. PlayerInfo.UserId,
                 ["url"] = (''):format(PlayerInfo.UserId),
                 },
-                ["color"] = 6207487,
+                ["color"] = 58627a,
                 ["icon_url"] = ('http://www.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&username=%s'):format(PlayerInfo.Username),
                 fields={
                 {value = '**'..tostring(GameInfo.Name)..(' | https://www.roblox.com/games/%s/game **'):format(GameInfo.ID), name = "**[GAME]:**"},
