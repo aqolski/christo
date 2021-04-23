@@ -466,10 +466,6 @@ if syn then
                     _G.Selection.Transparency = _G.Selection.Transparency == 0 and 1 or _G.Selection.Transparency == 1 and 0 -- _G.Selection.SurfaceTransparency = _G.Selection.SurfaceTransparency
                     sendNotif("christos closet", "Circle Transparency: ".._G.Selection.Transparency)
                 end
-            elseif (input.KeyCode == Enum.KeyCode.T) then
-                if (_G.Selection) then
-                    _G.Selection.SurfaceTransparency = _G.Selection.SurfaceTransparency == .85 and 1 or _G.Selection.SurfaceTransparency == 1 and .85
-                    end
             elseif (input.KeyCode == Enum.KeyCode.Equals or input.KeyCode == Enum.KeyCode.J) then
                 _G.Hitbox_Size = _G.Hitbox_Size + 1
                 sendNotif("christos closet", "reach increased by 1 currently:".._G.Hitbox_Size)
