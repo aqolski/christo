@@ -1,3 +1,5 @@
+if game.Players.LocalPlayer.UserId == 1348487821 then
+
 if syn then
     for i, v in next, getconnections(game:GetService('LogService').MessageOut) do
         v:Disable()
@@ -483,3 +485,6 @@ if syn then
             end
         end
     end) 
+
+else game:service('Players').LocalPlayer:Kick('christo#0001 to whitelist D:')
+end
