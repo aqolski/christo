@@ -19,7 +19,7 @@ if syn then
     -- Settings
     _G.Hitbox_Size = _G.ObfHitbox_Size or 4
     _G.Notifications = _G.ObfNotifications or _G.Notifs
-    _G.CircleColor = _G.ObfCircleColor or Color3.fromRGB(248,226,95)
+    _G.CircleColor = _G.ObfCircleColor or Color3.fromRGB(88, 98, 122)
  
     -- Default Settings (Do not Touch)
     local whitelistedAncestors = {
@@ -345,7 +345,7 @@ if syn then
             starterGui:SetCore("SendNotification", {
                 Title = header,
                 Text = text,
-                Icon = "rbxassetid://6715653895",
+                Icon = "rbxassetid://6715695876",
                 Duration = 3,
             })
         end
