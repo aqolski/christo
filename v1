@@ -451,7 +451,7 @@ if syn then
         if (_G.Selection) then
             _G.Selection.Adornee = nil
         end
-        sendNotif("christos closet", "is off.")
+        sendNotif("christos closet", "is off")
     end)
  
     userInput.InputBegan:Connect(function(input, processed)
